@@ -42,4 +42,19 @@ public class ScheduleController {
 
         return responseList;
     }
+
+    // 선택한 일정 단건의 정보를 조회
+    @GetMapping("/schedule/{id}")
+    public ScheduleResponseDTO findId(@PathVariable Long id) {
+        if (scheduleMap.containsKey(id)) {
+            // 일정의 고유 식별자(ID)를 사용하여 조회
+            Schedule schedule = scheduleMap.get(id);
+
+            ScheduleResponseDTO scheduleResponseDTO = new ScheduleResponseDTO(schedule);
+
+            return scheduleResponseDTO;
+        } else {
+            throw new IllegalArgumentException("선택한 메모는 존재하지 않습니다.");
+        }
+    }
 }
