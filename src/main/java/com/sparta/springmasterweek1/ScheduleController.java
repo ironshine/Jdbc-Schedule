@@ -84,6 +84,7 @@ public class ScheduleController {
             if (schedule.getPassword().equals(requestDTO.getPassword())) {
                 schedule.setName(requestDTO.getName());
                 schedule.setToDo(requestDTO.getToDo());
+                schedule.setDateTime(LocalDateTime.now());
             } else {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
@@ -92,7 +93,23 @@ public class ScheduleController {
 
             return scheduleResponseDTO;
         } else {
-            throw new IllegalArgumentException("입력한 id는 존재하지 않습니다.");
+            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
+        }
+    }
+
+    @DeleteMapping("/schedule/delete")
+    public String deleteSchedule(@RequestBody ScheduleRequestDTO requestDTO) {
+        if (scheduleMap.containsKey(requestDTO.getId())) {
+            // 일정의 고유 식별자(ID)를 사용하여 조회
+            Schedule schedule = scheduleMap.get(requestDTO.getId());
+            if (schedule.getPassword().equals(requestDTO.getPassword())) {
+                scheduleMap.remove(requestDTO.getId());
+                return "일정 삭제 완료";
+            } else {
+                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+            }
+        } else {
+            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
         }
     }
 }
