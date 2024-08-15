@@ -2,13 +2,15 @@ package com.sparta.springmasterweek1;
 
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ScheduleResponseDTO {
     private long id;
     private String toDo;
     private String name;
     private String password;
-    private String dateTime;
+    private LocalDateTime dateTime;
 
     public ScheduleResponseDTO(Schedule schedule) {
         this.id = schedule.getId();

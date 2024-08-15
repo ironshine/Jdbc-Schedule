@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,7 +14,7 @@ public class Schedule {
     private String toDo;
     private String name;
     private String password;
-    private String dateTime;
+    private LocalDateTime dateTime;
 
     public Schedule(ScheduleRequestDTO requestDTO) {
         this.toDo = requestDTO.getToDo();
