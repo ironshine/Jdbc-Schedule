@@ -10,7 +10,7 @@ public class ScheduleResponseDTO {
     private String toDo;
     private String name;
     private String password;
-    private LocalDateTime dateTime;
+    private String dateTime;
 
     public ScheduleResponseDTO(Schedule schedule) {
         this.id = schedule.getId();
@@ -18,5 +18,13 @@ public class ScheduleResponseDTO {
         this.name = schedule.getName();
         this.password = schedule.getPassword();
         this.dateTime = schedule.getDateTime();
+    }
+
+    public ScheduleResponseDTO(Long id, String toDo, String name, String password, String dateTime) {
+        this.id = id;
+        this.toDo = toDo;
+        this.name = name;
+        this.password = password;
+        this.dateTime = dateTime;
     }
 }

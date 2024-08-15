@@ -10,9 +10,9 @@ public class ScheduleRequestDTO {
     private String toDo;
     private String name;
     private String password;
-    private LocalDateTime dateTime;
+    private String dateTime;
 
-    public void setDateTime(LocalDateTime dateTime) {
+    public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 }

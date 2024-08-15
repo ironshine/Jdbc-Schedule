@@ -14,7 +14,7 @@ public class Schedule {
     private String toDo;
     private String name;
     private String password;
-    private LocalDateTime dateTime;
+    private String dateTime;
 
     public Schedule(ScheduleRequestDTO requestDTO) {
         this.toDo = requestDTO.getToDo();
