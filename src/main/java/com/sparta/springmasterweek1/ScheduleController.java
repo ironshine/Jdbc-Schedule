@@ -22,7 +22,6 @@ public class ScheduleController {
     public ScheduleController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    private final Map<Long, Schedule> scheduleMap = new HashMap<>();
 
     @PostMapping("/schedule")
     public ScheduleResponseDTO creatSchedule(@RequestBody ScheduleRequestDTO requestDTO) {
@@ -66,18 +65,7 @@ public class ScheduleController {
         // DB 조회
         String sql = "SELECT * FROM schedule";
 
-        return jdbcTemplate.query(sql, new RowMapper<ScheduleResponseDTO>() {
-            @Override
-            public ScheduleResponseDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-                // SQL 의 결과로 받아온 schedule 데이터들을 ScheduleResponseDTO 타입으로 변환해줄 메서드
-                Long id = rs.getLong("id");
-                String toDo = rs.getString("toDo");
-                String name = rs.getString("name");
-                String password = rs.getString("password");
-                String dateTime = rs.getString("dateTime");
-                return new ScheduleResponseDTO(id, toDo, name, password, dateTime);
-            }
-        });
+        return jdbcTemplate.query(sql, scheduleRowMapper());
     }
 
     // 선택한 일정 단건의 정보를 조회
@@ -88,47 +76,29 @@ public class ScheduleController {
         if(schedule != null) {
             // schedule id로 조회
             String sql = "SELECT * FROM schedule WHERE id = ?";
-            return jdbcTemplate.queryForObject(sql, new RowMapper<ScheduleResponseDTO>() {
-                @Override
-                public ScheduleResponseDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    // SQL 의 결과로 받아온 schedule 데이터들을 ScheduleResponseDTO 타입으로 변환해줄 메서드
-                    Long id = rs.getLong("id");
-                    String toDo = rs.getString("toDo");
-                    String name = rs.getString("name");
-                    String password = rs.getString("password");
-                    String dateTime = rs.getString("dateTime");
-                    return new ScheduleResponseDTO(id, toDo, name, password, dateTime);
-                }
-            }, id);
+            return jdbcTemplate.queryForObject(sql, scheduleRowMapper(), id);
         } else {
             throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
         }
     }
 
-    @GetMapping("/schedule/find/")
+    @GetMapping("/schedule/find")
     public List<ScheduleResponseDTO> findDateTimeName(@RequestParam(required = false) String dateTime, @RequestParam(required = false)String name) {
         String sql ="";
         if (dateTime != null && name != null) {
-            sql = "SELECT * FROM schedule WHERE dateTime LIKE ('?%') AND name = '?' ORDER BY dateTime DESC";
+            sql = "SELECT * FROM schedule WHERE dateTime LIKE ? AND name = ? ORDER BY dateTime DESC";
+            dateTime = dateTime + "%";
+            return jdbcTemplate.query(sql, scheduleRowMapper(), dateTime, name);
         } else if (dateTime != null && name == null) {
-            sql = "SELECT * FROM schedule WHERE dateTime LIKE ('?%') ORDER BY dateTime DESC";
+            sql = "SELECT * FROM schedule WHERE dateTime LIKE ? ORDER BY dateTime DESC";
+            dateTime = dateTime + "%";
+            return jdbcTemplate.query(sql, scheduleRowMapper(), dateTime);
         } else if (dateTime == null && name != null) {
-            sql = "SELECT * FROM schedule WHERE name = '?' ORDER BY dateTime DESC";
+            sql = "SELECT * FROM schedule WHERE name = ? ORDER BY dateTime DESC";
+            return jdbcTemplate.query(sql, scheduleRowMapper(), name);
         } else {
             throw new IllegalArgumentException("Param을 작성해주세요.");
         }
-        return jdbcTemplate.query(sql, new RowMapper<ScheduleResponseDTO>() {
-            @Override
-            public ScheduleResponseDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-                // SQL 의 결과로 받아온 schedule 데이터들을 ScheduleResponseDTO 타입으로 변환해줄 메서드
-                Long id = rs.getLong("id");
-                String toDo = rs.getString("toDo");
-                String name = rs.getString("name");
-                String password = rs.getString("password");
-                String dateTime = rs.getString("dateTime");
-                return new ScheduleResponseDTO(id, toDo, name, password, dateTime);
-            }
-        });
     }
     @PutMapping("/schedule/update")
     public ScheduleResponseDTO updateSchedule(@RequestBody ScheduleRequestDTO requestDTO) {
@@ -140,18 +110,8 @@ public class ScheduleController {
                 String sql = "UPDATE schedule SET name = ?, toDo = ?, dateTime = ? WHERE id = ?";
                 jdbcTemplate.update(sql, requestDTO.getName(), requestDTO.getToDo(), String.valueOf(LocalDateTime.now()), requestDTO.getId());
 
-                return jdbcTemplate.queryForObject(sql, new RowMapper<ScheduleResponseDTO>() {
-                    @Override
-                    public ScheduleResponseDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        // SQL 의 결과로 받아온 schedule 데이터들을 ScheduleResponseDTO 타입으로 변환해줄 메서드
-                        Long id = rs.getLong("id");
-                        String toDo = rs.getString("toDo");
-                        String name = rs.getString("name");
-                        String password = rs.getString("password");
-                        String dateTime = rs.getString("dateTime");
-                        return new ScheduleResponseDTO(id, toDo, name, password, dateTime);
-                    }
-                }, requestDTO.getId());
+                sql = "SELECT * FROM schedule WHERE id = ?";
+                return jdbcTemplate.queryForObject(sql, scheduleRowMapper(), requestDTO.getId());
             } else {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
@@ -195,5 +155,16 @@ public class ScheduleController {
                 return null;
             }
         }, id);
+    }
+    private RowMapper<ScheduleResponseDTO> scheduleRowMapper() {
+        return((rs, rowNum) -> {
+            // SQL 의 결과로 받아온 schedule 데이터들을 ScheduleResponseDTO 타입으로 변환해줄 메서드
+            Long id = rs.getLong("id");
+            String toDo = rs.getString("toDo");
+            String name = rs.getString("name");
+            String password = rs.getString("password");
+            String dateTime = rs.getString("dateTime");
+            return new ScheduleResponseDTO(id, toDo, name, password, dateTime);
+        });
     }
 }
