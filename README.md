@@ -8,3 +8,13 @@
 | 일정 목록 조회 | `GET` | /api/schedule | 요청 param | 일정 목록 정보 |
 | 일정 수정 | `PUT` | /api/schedule/update | 요청 body | 일정 수정 정보 |
 | 일정 삭제 | `DELETE` | /api/schedule/delete | 요청 body | - |
+
+### ERD
+
+| schedule |
+|----------------|
+| id (pk)|
+| toDo |
+| name |
+| password |
+| dateTime |
